@@ -1,42 +1,30 @@
 package main
 
-import "errors"
+import (
+	"errors"
 
-type ClientStore interface {
-	GetClientById(id string) (*Client, error)
-}
-
-type Client struct {
-	ClientId     string
-	ClientSecret string
-	RedirectUri  string
-}
-
-func (c *Client) ValidateSecret(secret string) error {
-	if c.ClientSecret != secret {
-		return errors.New("")
-	}
-	return nil
-}
+	"github.com/deb-ict/go-identity/pkg/identity"
+)
 
 type clientStore struct {
-	clients map[string]*Client
+	clients map[string]*identity.Client
 }
 
-func NewClientStore() ClientStore {
+func NewClientStore() identity.ClientStore {
 	store := clientStore{
-		clients: make(map[string]*Client),
+		clients: make(map[string]*identity.Client),
 	}
 
-	store.clients["myclient"] = &Client{
+	s, _ := ClientSecretHasher.HashSecret("mysecret")
+	store.clients["myclient"] = &identity.Client{
 		ClientId:     "myclient",
-		ClientSecret: "mysecret",
+		ClientSecret: s,
 	}
 
 	return &store
 }
 
-func (store *clientStore) GetClientById(id string) (*Client, error) {
+func (store *clientStore) GetClientById(id string) (*identity.Client, error) {
 	client := store.clients[id]
 	if client == nil {
 		return nil, errors.New("client not found")

@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/deb-ict/go-identity/internal/grants"
 	"github.com/deb-ict/go-identity/pkg/response"
 )
 
@@ -20,7 +21,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the grant type
-	var grantHandler GrantTypeHandler
+	var grantHandler grants.GrantTypeHandler
 	grant_type := r.FormValue("grant_type")
 	if grant_type == "" {
 		response.InvalidRequest(w)
@@ -47,7 +48,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		clientId = r.FormValue("client_id")
 		clientSecret = r.FormValue("client_secret")
 	}
-	client, err := ClientStoreInstance.GetClientById(clientId)
+	client, err := ClientStore.GetClientById(clientId)
 	if err != nil {
 		if useBasicAuth {
 			response.InvalidClientAuth(w)
@@ -57,7 +58,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = client.ValidateSecret(clientSecret)
+	err = ClientSecretHasher.VerifySecret(client.ClientSecret, clientSecret)
 	if err != nil {
 		if useBasicAuth {
 			response.InvalidClientAuth(w)

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/deb-ict/go-identity/pkg/identity"
 )
 
 // OAuth 2.0 Authorization Endpoint
@@ -29,8 +31,8 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 
 	clientId := r.FormValue("client_id")
 	clientSecret := r.FormValue("client_secret")
-	client, _ := ClientStoreInstance.GetClientById(clientId)
-	client.ValidateSecret(clientSecret)
+	client, _ := ClientStore.GetClientById(clientId)
+	ClientSecretHasher.VerifySecret(client.ClientSecret, clientSecret)
 
 	redirectUri := r.FormValue("redirect_uri")
 	if redirectUri == "" {
@@ -77,7 +79,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, target, http.StatusFound)
 }
 
-func CodeAuthorizeHandler(w http.ResponseWriter, r *http.Request, redirectUri *url.URL, client *Client) {
+func CodeAuthorizeHandler(w http.ResponseWriter, r *http.Request, redirectUri *url.URL, client *identity.Client) {
 
 	/*
 		authCode := AuthorizationCode{
@@ -86,7 +88,7 @@ func CodeAuthorizeHandler(w http.ResponseWriter, r *http.Request, redirectUri *u
 	*/
 }
 
-func TokenAuthorizeHandler(w http.ResponseWriter, r *http.Request, redirectUri *url.URL, client *Client) {
+func TokenAuthorizeHandler(w http.ResponseWriter, r *http.Request, redirectUri *url.URL, client *identity.Client) {
 
 }
 

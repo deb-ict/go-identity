@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/deb-ict/go-identity/pkg/identity"
 	"github.com/deb-ict/go-identity/pkg/response"
 )
 
-func PasswordGrantHandler(w http.ResponseWriter, r *http.Request, client *Client) {
+func PasswordGrantHandler(w http.ResponseWriter, r *http.Request, client *identity.Client) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 	if username == "" || password == "" {
@@ -47,8 +49,25 @@ func PasswordGrantHandler(w http.ResponseWriter, r *http.Request, client *Client
 	}
 	responseScope := strings.Join(responseScopes, " ")
 
+	// Setup the claims
+	c := identity.Claims{}
+	c.SetIssuer("http://localhost:5000")
+	c.SetIssuedAt(time.Now())
+	c.SetExpiresAt(time.Now().Add(time.Minute * 15))
+	c.SetNotBefore(time.Now().Add(time.Second * 5))
+	c.SetAudience("some_audience")
+	c.SetSubject("my_user_id")
+
+	// Generate the token
+	token, err := TokenManager.GenerateAccessToken(c)
+	if err != nil {
+		response.InvalidRequest(w)
+		return
+	}
+
+	// Return the response
 	response := response.TokenResponse{
-		AccessToken:  "this_is_my_secret_token",
+		AccessToken:  token,
 		RefreshToken: "refresh_with_me",
 		TokenType:    "bearer",
 		Expires:      3600,

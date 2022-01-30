@@ -8,10 +8,11 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/deb-ict/go-identity/pkg/identity"
 	"github.com/deb-ict/go-identity/pkg/response"
 )
 
-func RefreshTokenGrantHandler(w http.ResponseWriter, r *http.Request, client *Client) {
+func RefreshTokenGrantHandler(w http.ResponseWriter, r *http.Request, client *identity.Client) {
 	refreshToken := r.FormValue("refresh_token")
 	if refreshToken == "" {
 		response.InvalidRequest(w)

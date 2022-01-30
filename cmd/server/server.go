@@ -4,17 +4,20 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/deb-ict/go-identity/pkg/identity"
 	"github.com/gorilla/mux"
 )
 
 var (
-	ClientStoreInstance ClientStore
+	ClientSecretHasher identity.SecretHasher
+	ClientStore        identity.ClientStore
+	TokenManager       identity.TokenManager
 )
 
-type GrantTypeHandler func(w http.ResponseWriter, r *http.Request, client *Client)
-
 func main() {
-	ClientStoreInstance = NewClientStore()
+	ClientSecretHasher = identity.NewSecretHasher()
+	ClientStore = NewClientStore()
+	TokenManager = identity.NewJwtTokenManager()
 
 	router := mux.NewRouter().StrictSlash(true)
 

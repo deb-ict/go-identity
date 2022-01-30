@@ -6,10 +6,11 @@ package main
 import (
 	"net/http"
 
+	"github.com/deb-ict/go-identity/pkg/identity"
 	"github.com/deb-ict/go-identity/pkg/response"
 )
 
-func AuthorizationCodeGrantHandler(w http.ResponseWriter, r *http.Request, client *Client) {
+func AuthorizationCodeGrantHandler(w http.ResponseWriter, r *http.Request, client *identity.Client) {
 	//code := r.FormValue("code")
 	//redirect_uri := r.FormValue("redirect_uri")
 
