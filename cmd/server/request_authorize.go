@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -11,6 +12,9 @@ import (
 // OAuth 2.0 Authorization Endpoint
 // https://datatracker.ietf.org/doc/html/rfc6749#section-3.1
 func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
+
+	log.Println("REQUEST: /auth/authorize")
+
 	//https://datatracker.ietf.org/doc/html/rfc6749#section-4.2.2
 	//The authorization server MUST NOT issue a refresh token.
 
@@ -31,12 +35,12 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 
 	clientId := r.FormValue("client_id")
 	clientSecret := r.FormValue("client_secret")
-	client, _ := ClientStore.GetClientById(clientId)
+	client, _ := ClientStore.GetClientByClientId(r.Context(), clientId)
 	ClientSecretHasher.VerifySecret(client.ClientSecret, clientSecret)
 
 	redirectUri := r.FormValue("redirect_uri")
-	if redirectUri == "" {
-		redirectUri = client.RedirectUri
+	if redirectUri == "" && len(client.RedirectUris) > 0 {
+		redirectUri = client.RedirectUris[0]
 	}
 	parsedUri, _ := url.ParseRequestURI(redirectUri)
 

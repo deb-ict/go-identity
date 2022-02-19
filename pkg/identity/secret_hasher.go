@@ -4,6 +4,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type SecretHasher interface {
+	VerifySecret(hash string, secret string) error
+	HashSecret(secret string) (string, error)
+}
+
 func NewSecretHasher() SecretHasher {
 	return &secretHasher{}
 }

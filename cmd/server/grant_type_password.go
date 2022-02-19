@@ -21,16 +21,22 @@ func PasswordGrantHandler(w http.ResponseWriter, r *http.Request, client *identi
 		return
 	}
 
-	if username != "myuser" || password != "mypass" {
-		response.InvalidRequest(w) //TODO: Set correct error
-		return
-	}
-
 	//OPTIONAL: scope
 	requestScope := r.FormValue("scope")
 	if requestScope == "" {
 		//TODO: Get default scope
 		requestScope = ""
+	}
+
+	user, err := UserStore.GetUserByUserName(username)
+	if err != nil {
+		response.InvalidRequest(w) //TODO: Set correct error
+		return
+	}
+	err = ClientSecretHasher.VerifySecret(user.Password, password)
+	if err != nil {
+		response.InvalidRequest(w) //TODO: Set correct error
+		return
 	}
 
 	// Validate the scopes
@@ -55,8 +61,11 @@ func PasswordGrantHandler(w http.ResponseWriter, r *http.Request, client *identi
 	c.SetIssuedAt(time.Now())
 	c.SetExpiresAt(time.Now().Add(time.Minute * 15))
 	c.SetNotBefore(time.Now().Add(time.Second * 5))
+	//c.SetNotBefore(time.Now().Add(time.Second * 5)) < increase based on request rate
 	c.SetAudience("some_audience")
+	c.SetScopes(responseScopes...)
 	c.SetSubject("my_user_id")
+	c.SetRoles("role1", "role2")
 
 	// Generate the token
 	token, err := TokenManager.GenerateAccessToken(c)
@@ -64,6 +73,8 @@ func PasswordGrantHandler(w http.ResponseWriter, r *http.Request, client *identi
 		response.InvalidRequest(w)
 		return
 	}
+
+	// Generate refresh token
 
 	// Return the response
 	response := response.TokenResponse{

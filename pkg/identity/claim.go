@@ -58,3 +58,29 @@ func (c Claims) GetSubject() string {
 func (c Claims) SetSubject(value string) {
 	c[claimtypes.Subject] = value
 }
+
+func (c Claims) GetScopes() []string {
+	v := c[claimtypes.Scope].([]interface{})
+	s := make([]string, 0)
+	for _, i := range v {
+		s = append(s, i.(string))
+	}
+	return s
+}
+
+func (c Claims) SetScopes(value ...string) {
+	c[claimtypes.Scope] = value
+}
+
+func (c Claims) GetRoles() []string {
+	v := c[claimtypes.Scope].([]interface{})
+	s := make([]string, 0)
+	for _, i := range v {
+		s = append(s, i.(string))
+	}
+	return s
+}
+
+func (c Claims) SetRoles(value ...string) {
+	c[claimtypes.Scope] = value
+}

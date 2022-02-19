@@ -3,9 +3,22 @@ package identity
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/golang-jwt/jwt"
 )
+
+type AccessToken struct {
+	Type string
+}
+
+type RefreshToken struct {
+	CreatedAt time.Time
+	Lifetime  time.Duration
+	Token     AccessToken
+	User      User
+	Scopes    []string
+}
 
 type TokenManager interface {
 	GenerateAccessToken(claims Claims) (string, error)

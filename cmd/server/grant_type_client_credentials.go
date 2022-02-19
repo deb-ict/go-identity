@@ -14,7 +14,7 @@ import (
 )
 
 func ClientCredentialsGrantHandler(w http.ResponseWriter, r *http.Request, client *identity.Client) {
-	//OPTIONAL: scope
+	// Parse the scope
 	requestScope := r.FormValue("scope")
 	if requestScope == "" {
 		//TODO: Get default scope
@@ -42,20 +42,15 @@ func ClientCredentialsGrantHandler(w http.ResponseWriter, r *http.Request, clien
 	c.SetIssuer("http://localhost:5000")
 	c.SetIssuedAt(time.Now())
 	c.SetExpiresAt(time.Now().Add(time.Minute * 15))
-	c.SetNotBefore(time.Now().Add(time.Second * 5))
+	//c.SetNotBefore(time.Now().Add(time.Second * 5)) < increase based on request rate
 	c.SetAudience("some_audience")
-	c["role"] = []string{"role1", "role2"}
+	c.SetScopes(responseScopes...)
 
 	// Generate the token
 	token, err := TokenManager.GenerateAccessToken(c)
 	if err != nil {
 		response.InvalidRequest(w)
 		return
-	}
-
-	claims, err := TokenManager.ValidateAccessToken(token)
-	for k, v := range claims {
-		fmt.Printf(" - %v = %v\n", k, v)
 	}
 
 	// Return the response
