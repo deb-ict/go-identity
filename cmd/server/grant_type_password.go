@@ -28,7 +28,7 @@ func PasswordGrantHandler(w http.ResponseWriter, r *http.Request, client *identi
 		requestScope = ""
 	}
 
-	user, err := UserStore.GetUserByUserName(username)
+	user, err := UserStore.GetUserByUserName(r.Context(), username)
 	if err != nil {
 		response.InvalidRequest(w) //TODO: Set correct error
 		return
