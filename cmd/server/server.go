@@ -44,7 +44,7 @@ func main() {
 
 	// Initialize the clients
 	ClientStore = db.GetClientStore()
-	UserStore = NewUserStore()
+	UserStore = db.GetUserStore()
 
 	TokenManager = identity.NewJwtTokenManager()
 

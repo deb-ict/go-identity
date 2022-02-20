@@ -17,9 +17,9 @@ const (
 )
 
 var (
-	ErrClientNotCreated error = errors.New("failed to create record")
-	ErrClientNotUpdated error = errors.New("failed to update record")
-	ErrClientNotDeleted error = errors.New("failed to delete record")
+	ErrClientNotCreated error = errors.New("failed to create client")
+	ErrClientNotUpdated error = errors.New("failed to update client")
+	ErrClientNotDeleted error = errors.New("failed to delete client")
 )
 
 type ClientStore interface {

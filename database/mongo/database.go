@@ -15,6 +15,7 @@ type Database interface {
 	Close() error
 	GetConfig() Config
 	GetClientStore() identity.ClientStore
+	GetUserStore() identity.UserStore
 }
 
 func NewDatabase() Database {
@@ -77,6 +78,14 @@ func (db *database) GetConfig() Config {
 func (db *database) GetClientStore() identity.ClientStore {
 	collection := db.database.Collection("client")
 	return &clientStore{
+		db:         db,
+		collection: collection,
+	}
+}
+
+func (db *database) GetUserStore() identity.UserStore {
+	collection := db.database.Collection("user")
+	return &userStore{
 		db:         db,
 		collection: collection,
 	}

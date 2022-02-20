@@ -15,7 +15,7 @@ type clientDocument struct {
 	Id                     primitive.ObjectID `bson:"_id,omitempty"`
 	ClientId               string             `bson:"clientId"`
 	ClientSecret           string             `bson:"clientSecret"`
-	RedirectUris           []string           `bson:"redirectUri"`
+	RedirectUris           []string           `bson:"redirectUris"`
 	AllowedScopes          []string           `bson:"allowedScopes"`
 	RefreshTokenUsage      string             `bson:"refreshTokenUsage"`
 	RefreshTokenExpiration string             `bson:"refreshTokenExpiration"`
@@ -121,6 +121,7 @@ func (store *clientStore) CreateClient(ctx context.Context, client *identity.Cli
 		RefreshTokenUsage:      string(client.RefreshTokenUsage),
 		RefreshTokenExpiration: string(client.RefreshTokenExpiration),
 		RefreshTokenLifetime:   client.RefreshTokenLifetime,
+		IsDeleted:              false,
 	}
 
 	result, err := store.collection.InsertOne(ctx, doc)
@@ -142,19 +143,15 @@ func (store *clientStore) UpdateClient(ctx context.Context, id string, client *i
 		return err
 	}
 
-	doc := clientDocument{
-		Id:                     objectId,
-		ClientId:               client.ClientId,
-		ClientSecret:           client.ClientSecret,
-		RedirectUris:           client.RedirectUris,
-		AllowedScopes:          client.AllowedScopes,
-		RefreshTokenUsage:      string(client.RefreshTokenUsage),
-		RefreshTokenExpiration: string(client.RefreshTokenExpiration),
-		RefreshTokenLifetime:   client.RefreshTokenLifetime,
-	}
-
 	filter := bson.M{"_id": objectId}
-	update := bson.M{"$set": doc}
+	update := bson.M{
+		"clientSecret":           client.ClientSecret,
+		"redirectUris":           client.RedirectUris,
+		"allowedScopes":          client.AllowedScopes,
+		"refreshTokenUsage":      string(client.RefreshTokenUsage),
+		"refreshTokenExpiration": string(client.RefreshTokenExpiration),
+		"refreshTokenLifetime":   client.RefreshTokenLifetime,
+	}
 
 	result, err := store.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
@@ -162,7 +159,7 @@ func (store *clientStore) UpdateClient(ctx context.Context, id string, client *i
 	}
 
 	if result.MatchedCount == 0 {
-		return identity.ErrClientNotDeleted
+		return identity.ErrClientNotUpdated
 	}
 	return nil
 }
