@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/deb-ict/go-identity/internal/grants"
@@ -13,8 +12,6 @@ import (
 //	Content-Type: application/x-www-form-urlencoded
 func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-
-	log.Println("REQUEST: /auth/token")
 
 	// Parse the form
 	err = r.ParseForm()
@@ -45,29 +42,8 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Basic authentication
-	clientId, clientSecret, useBasicAuth := r.BasicAuth()
-	if !useBasicAuth {
-		clientId = r.FormValue("client_id")
-		clientSecret = r.FormValue("client_secret")
-	}
-	client, err := ClientStore.GetClientByClientId(r.Context(), clientId)
+	client, err := ClientManager.GetClientFromRequest(w, r)
 	if err != nil {
-		if useBasicAuth {
-			response.InvalidClientAuth(w)
-		} else {
-			response.InvalidClient(w)
-		}
-		return
-	}
-
-	err = ClientSecretHasher.VerifySecret(client.ClientSecret, clientSecret)
-	if err != nil {
-		if useBasicAuth {
-			response.InvalidClientAuth(w)
-		} else {
-			response.InvalidClient(w)
-		}
 		return
 	}
 

@@ -6,9 +6,10 @@ import (
 )
 
 var (
-	ErrUserNotCreated error = errors.New("failed to create user")
-	ErrUserNotUpdated error = errors.New("failed to update user")
-	ErrUserNotDeleted error = errors.New("failed to delete user")
+	ErrUserNotFound   error = errors.New("user not found")
+	ErrUserNotCreated error = errors.New("user not created")
+	ErrUserNotUpdated error = errors.New("user not updated")
+	ErrUserNotDeleted error = errors.New("user not deleted")
 )
 
 type UserStore interface {
@@ -21,17 +22,18 @@ type UserStore interface {
 }
 
 type User struct {
-	Username      string
-	Password      string
-	Email         string
-	EmailVerified bool
+	Id            string `json:"id"`
+	Username      string `json:"username"`
+	Password      string `json:"password"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
 }
 
 type UserPage struct {
-	PageIndex int
-	PageSize  int
-	Count     int
-	Items     []*User
+	PageIndex int     `json:"page_index"`
+	PageSize  int     `json:"page_size"`
+	Count     int     `json:"count"`
+	Items     []*User `json:"items"`
 }
 
 type UserSearch struct {

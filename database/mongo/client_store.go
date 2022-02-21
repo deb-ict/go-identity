@@ -30,6 +30,7 @@ type clientStore struct {
 
 func (doc *clientDocument) toViewModel() *identity.Client {
 	return &identity.Client{
+		Id:                     doc.Id.Hex(),
 		ClientId:               doc.ClientId,
 		ClientSecret:           doc.ClientSecret,
 		RedirectUris:           doc.RedirectUris,

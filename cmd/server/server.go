@@ -12,24 +12,27 @@ import (
 )
 
 var (
-	ClientSecretHasher identity.SecretHasher
-	ClientStore        identity.ClientStore
-	UserStore          identity.UserStore
-	TokenManager       identity.TokenManager
+	ClientManager identity.ClientManager
+	UserManager   identity.UserManager
+	TokenManager  identity.TokenManager
 )
 
 func main() {
-	ClientSecretHasher = identity.NewSecretHasher()
+	//ClientSecretHasher = identity.NewSecretHasher()
 
 	// Initialize database
 	db := mongo.NewDatabase()
 	db.Open()
 	defer db.Close()
 
+	// Initialize the managers
+	ClientManager = identity.NewClientManager(db.GetClientStore())
+	UserManager = identity.NewUserManager(db.GetUserStore())
+
 	//
-	clientPage, _ := db.GetClientStore().GetClients(context.TODO(), identity.ClientSearch{}, 0, 1)
+	clientPage, _ := ClientManager.GetStore().GetClients(context.TODO(), identity.ClientSearch{}, 0, 1)
 	if clientPage.Count == 0 {
-		clientSecret, _ := ClientSecretHasher.HashSecret("mysecret")
+		clientSecret, _ := ClientManager.GetSecretHasher().HashSecret("mysecret")
 		client := identity.Client{
 			ClientId:               "myclient",
 			ClientSecret:           clientSecret,
@@ -41,10 +44,6 @@ func main() {
 		}
 		db.GetClientStore().CreateClient(context.TODO(), &client)
 	}
-
-	// Initialize the clients
-	ClientStore = db.GetClientStore()
-	UserStore = db.GetUserStore()
 
 	TokenManager = identity.NewJwtTokenManager()
 

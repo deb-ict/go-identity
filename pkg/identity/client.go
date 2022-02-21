@@ -17,9 +17,10 @@ const (
 )
 
 var (
-	ErrClientNotCreated error = errors.New("failed to create client")
-	ErrClientNotUpdated error = errors.New("failed to update client")
-	ErrClientNotDeleted error = errors.New("failed to delete client")
+	ErrClientNotFound   error = errors.New("client not found")
+	ErrClientNotCreated error = errors.New("client not created")
+	ErrClientNotUpdated error = errors.New("client not updated")
+	ErrClientNotDeleted error = errors.New("client not deleted")
 )
 
 type ClientStore interface {
@@ -32,20 +33,21 @@ type ClientStore interface {
 }
 
 type Client struct {
-	ClientId               string
-	ClientSecret           string
-	RedirectUris           []string
-	AllowedScopes          []string
-	RefreshTokenUsage      RefreshTokenUsage
-	RefreshTokenExpiration RefreshTokenExpirationType
-	RefreshTokenLifetime   time.Duration
+	Id                     string                     `json:"id"`
+	ClientId               string                     `json:"client_id"`
+	ClientSecret           string                     `json:"client_secret"`
+	RedirectUris           []string                   `json:"redirect_uris"`
+	AllowedScopes          []string                   `json:"allowed_scopes"`
+	RefreshTokenUsage      RefreshTokenUsage          `json:"refresh_token_usage"`
+	RefreshTokenExpiration RefreshTokenExpirationType `json:"refresh_token_expiration"`
+	RefreshTokenLifetime   time.Duration              `json:"refresh_token_lifetime"`
 }
 
 type ClientPage struct {
-	PageIndex int
-	PageSize  int
-	Count     int
-	Items     []*Client
+	PageIndex int       `json:"page_index"`
+	PageSize  int       `json:"page_size"`
+	Count     int       `json:"count"`
+	Items     []*Client `json:"items"`
 }
 
 type ClientSearch struct {
@@ -53,8 +55,8 @@ type ClientSearch struct {
 
 func (c *Client) SetDefaults() {
 	c.RefreshTokenExpiration = SlidingRefreshTokenExpiration
-	c.RefreshTokenLifetime = (15 * 24 * time.Hour)
 	c.RefreshTokenUsage = ReUseRefreshTokenUsage
+	c.RefreshTokenLifetime = (15 * 24 * time.Hour)
 }
 
 func (c *Client) ScopeAllowed(scope string) bool {

@@ -26,6 +26,7 @@ type userStore struct {
 
 func (doc *userDocument) toViewModel() *identity.User {
 	return &identity.User{
+		Id:            doc.Id.Hex(),
 		Username:      doc.UserName,
 		Password:      doc.Password,
 		Email:         doc.Email,

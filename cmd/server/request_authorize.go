@@ -33,10 +33,10 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	*/
 
-	clientId := r.FormValue("client_id")
-	clientSecret := r.FormValue("client_secret")
-	client, _ := ClientStore.GetClientByClientId(r.Context(), clientId)
-	ClientSecretHasher.VerifySecret(client.ClientSecret, clientSecret)
+	client, err := ClientManager.GetClientFromRequest(w, r)
+	if err != nil {
+		return
+	}
 
 	redirectUri := r.FormValue("redirect_uri")
 	if redirectUri == "" && len(client.RedirectUris) > 0 {
