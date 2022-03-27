@@ -8,4 +8,5 @@ var (
 	ClientManager identity.ClientManager
 	UserManager   identity.UserManager
 	TokenManager  identity.TokenManager
+	AuthCodeStore identity.AuthorizationCodeStore
 )

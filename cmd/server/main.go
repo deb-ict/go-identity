@@ -27,6 +27,14 @@ func getConfigPath(configPath string) string {
 	return configPath
 }
 
+func handleAccountLoginGet(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func handleAccountLoginPost(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func main() {
 	var err error
 
@@ -92,6 +100,9 @@ func main() {
 	router.HandleFunc("/auth/userinfo", wip.UserInfoHandler).Methods("GET")
 	router.HandleFunc("/auth/endsession", wip.EndSessionHandler).Methods("GET")
 	router.HandleFunc("/.well-known/openid-configuration", wip.WellKnownConfigurationHandler).Methods("GET")
+
+	router.HandleFunc("/account/login", handleAccountLoginGet).Methods("GET")
+	router.HandleFunc("/account/login", handleAccountLoginPost).Methods("POST")
 
 	router.HandleFunc("/cb", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Callback invoked\n")

@@ -11,6 +11,7 @@ var (
 
 type UserManager interface {
 	LoginUser(ctx context.Context, username string, password string) (*User, error)
+	GetStore() UserStore
 }
 
 func NewUserManager(store UserStore) UserManager {
@@ -35,4 +36,8 @@ func (manager *userManager) LoginUser(ctx context.Context, username string, pass
 		return nil, ErrInvalidCredentials
 	}
 	return user, nil
+}
+
+func (manager *userManager) GetStore() UserStore {
+	return manager.store
 }
