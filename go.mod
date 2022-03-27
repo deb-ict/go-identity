@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/mux v1.8.0
+	github.com/joho/godotenv v1.4.0
 	go.mongodb.org/mongo-driver v1.8.3
 	golang.org/x/crypto v0.0.0-20220128200615-198e4374d7ed
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b

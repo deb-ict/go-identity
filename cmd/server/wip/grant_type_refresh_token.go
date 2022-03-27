@@ -1,7 +1,7 @@
 // Refresh access token
 // https://datatracker.ietf.org/doc/html/rfc6749#section-6
 
-package main
+package wip
 
 import (
 	"fmt"

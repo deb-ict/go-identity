@@ -1,6 +1,8 @@
-package main
+package wip
 
-import "net/http"
+import (
+	"net/http"
+)
 
 func GetClientsHandler(w http.ResponseWriter, r *http.Request) {
 

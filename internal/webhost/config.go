@@ -1,4 +1,4 @@
-package mongo
+package webhost
 
 import (
 	"os"
@@ -7,35 +7,35 @@ import (
 )
 
 type Config interface {
-	GetUri() string
-	GetDatabase() string
+	GetHttpBind() string
+	GetHttpPort() string
 	Load(configPath string) error
 }
 
 func NewConfig() Config {
 	return &config{
-		MongoDb: mongoDbConfig{
-			Uri:      "mongodb://localhost:27017",
-			Database: "identity",
+		Http: httpConfig{
+			Bind: "0.0.0.0",
+			Port: "80",
 		},
 	}
 }
 
 type config struct {
-	MongoDb mongoDbConfig `yaml:"mongodb"`
+	Http httpConfig `yaml:"http"`
 }
 
-type mongoDbConfig struct {
-	Uri      string `yaml:"uri"`
-	Database string `yaml:"database"`
+type httpConfig struct {
+	Bind string `yaml:"bind"`
+	Port string `yaml:"port"`
 }
 
-func (cfg *config) GetUri() string {
-	return cfg.MongoDb.Uri
+func (cfg *config) GetHttpBind() string {
+	return cfg.Http.Bind
 }
 
-func (cfg *config) GetDatabase() string {
-	return cfg.MongoDb.Database
+func (cfg *config) GetHttpPort() string {
+	return cfg.Http.Port
 }
 
 func (cfg *config) Load(configPath string) error {
@@ -63,12 +63,12 @@ func (cfg *config) loadYaml(configPath string) error {
 }
 
 func (cfg *config) LoadEnvironment() {
-	mongo_uri, ok := os.LookupEnv("MONGO_URI")
-	if ok && len(mongo_uri) > 0 {
-		cfg.MongoDb.Uri = mongo_uri
+	http_bind, ok := os.LookupEnv("HTTP_BIND")
+	if ok && len(http_bind) > 0 {
+		cfg.Http.Bind = http_bind
 	}
-	mongo_db, ok := os.LookupEnv("MONGO_DB")
-	if ok && len(mongo_db) > 0 {
-		cfg.MongoDb.Database = mongo_db
+	http_port, ok := os.LookupEnv("HTTP_PORT")
+	if ok && len(http_port) > 0 {
+		cfg.Http.Port = http_port
 	}
 }

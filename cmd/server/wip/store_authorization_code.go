@@ -1,4 +1,4 @@
-package main
+package wip
 
 type AuthorizationCodeStore interface {
 	GetAuthorizationCode(clientId string, code string) (*AuthorizationCode, error)

@@ -1,0 +1,8 @@
+http:
+  bind: "0.0.0.0"
+  port: "80"
+database:
+  type: "mongodb"
+mongodb:
+  uri: "mongodb://localhost:27017"
+  database: "cloudbm"
