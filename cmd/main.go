@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/deb-ict/go-identity/pkg/identity"
+	"github.com/deb-ict/go-router"
 )
 
 type TokenResponse struct {
@@ -205,7 +206,7 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	router := http.NewServeMux()
+	router := router.NewRouter()
 	router.HandleFunc("/", helloHandler)
 	router.HandleFunc("/authorize", authorizeHandler)
 	router.HandleFunc("/token", tokenHandler)
