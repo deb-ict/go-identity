@@ -1,25 +1,28 @@
-package oauth
+package grant_type
 
 import (
 	"errors"
 	"net/http"
+
+	oauth_http "github.com/deb-ict/go-identity/pkg/http"
+	"github.com/deb-ict/go-identity/pkg/oauth"
 )
 
-func NewClientCredentialsGrantType(svc OAuthService) GrantTypeHandler {
+func NewClientCredentialsGrantType(svc oauth.OAuthService) oauth.GrantTypeHandler {
 	return &clientCredentialsGrantType{
 		svc: svc,
 	}
 }
 
 type clientCredentialsGrantType struct {
-	svc OAuthService
+	svc oauth.OAuthService
 }
 
-func (grantType *clientCredentialsGrantType) HandleRequest(client *Client, r *http.Request) (*AccessToken, *RefreshToken, error) {
+func (grantType *clientCredentialsGrantType) HandleRequest(client *oauth.Client, r *http.Request) (*oauth.AccessToken, *oauth.RefreshToken, error) {
 	ctx := r.Context()
 
 	// Validate the scope request parameter
-	scopes, err := getScopesParam(r)
+	scopes, err := oauth_http.GetScopesParam(r)
 	if err != nil {
 		return nil, nil, err
 	}

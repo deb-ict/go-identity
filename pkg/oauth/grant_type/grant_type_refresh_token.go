@@ -1,27 +1,30 @@
-package oauth
+package grant_type
 
 import (
 	"context"
 	"errors"
 	"net/http"
 	"time"
+
+	oauth_http "github.com/deb-ict/go-identity/pkg/http"
+	"github.com/deb-ict/go-identity/pkg/oauth"
 )
 
-func NewRefreshTokenGrantType(svc OAuthService) GrantTypeHandler {
+func NewRefreshTokenGrantType(svc oauth.OAuthService) oauth.GrantTypeHandler {
 	return &refreshTokenGrantType{
 		svc: svc,
 	}
 }
 
 type refreshTokenGrantType struct {
-	svc OAuthService
+	svc oauth.OAuthService
 }
 
-func (grantType *refreshTokenGrantType) HandleRequest(client *Client, r *http.Request) (*AccessToken, *RefreshToken, error) {
+func (grantType *refreshTokenGrantType) HandleRequest(client *oauth.Client, r *http.Request) (*oauth.AccessToken, *oauth.RefreshToken, error) {
 	ctx := r.Context()
 
 	// Validate the scope request parameter
-	scopes, err := getScopesParam(r)
+	scopes, err := oauth_http.GetScopesParam(r)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -30,7 +33,7 @@ func (grantType *refreshTokenGrantType) HandleRequest(client *Client, r *http.Re
 	}
 
 	// Get the refresh from request parameters
-	token, err := getStringParam(r, "refresh_token")
+	token, err := oauth_http.GetStringParam(r, "refresh_token")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -39,6 +42,14 @@ func (grantType *refreshTokenGrantType) HandleRequest(client *Client, r *http.Re
 	refreshToken, err := grantType.svc.GetRefreshTokenByToken(ctx, token)
 	if err != nil {
 		return nil, nil, err
+	}
+
+	// Validate the refresh token
+	if refreshToken.ClientId != client.ClientId {
+		return nil, nil, errors.New("invalid_request")
+	}
+	if refreshToken.HasExpired() {
+		return nil, nil, errors.New("invalid_request")
 	}
 
 	// Validate the scopes
@@ -80,9 +91,9 @@ func (grantType *refreshTokenGrantType) HandleRequest(client *Client, r *http.Re
 	return accessToken, refreshToken, nil
 }
 
-func (grantType *refreshTokenGrantType) updateRefreshToken(ctx context.Context, client *Client, accessToken *AccessToken, refreshToken *RefreshToken) (*RefreshToken, error) {
+func (grantType *refreshTokenGrantType) updateRefreshToken(ctx context.Context, client *oauth.Client, accessToken *oauth.AccessToken, refreshToken *oauth.RefreshToken) (*oauth.RefreshToken, error) {
 	var err error
-	if refreshToken.TokenUsage == RefreshTokenUsageOneTime {
+	if refreshToken.TokenUsage == oauth.RefreshTokenUsageOneTime {
 		// Delete the old refresh token
 		err = grantType.svc.DeleteRefreshToken(ctx, refreshToken.Id)
 		if err != nil {
@@ -103,9 +114,7 @@ func (grantType *refreshTokenGrantType) updateRefreshToken(ctx context.Context, 
 	} else {
 		// Modify the existing token
 		refreshToken.AccessTokenId = accessToken.Id
-		if refreshToken.TokenExpiration == RefreshTokenExpirationSliding {
-			refreshToken.UpdatedAt = time.Now().UTC()
-		}
+		refreshToken.UpdatedAt = time.Now().UTC()
 
 		// Save the refresh token
 		refreshToken, err = grantType.svc.UpdateRefreshToken(ctx, refreshToken.Id, refreshToken)

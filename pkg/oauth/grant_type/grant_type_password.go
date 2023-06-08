@@ -1,25 +1,28 @@
-package oauth
+package grant_type
 
 import (
 	"errors"
 	"net/http"
+
+	oauth_http "github.com/deb-ict/go-identity/pkg/http"
+	"github.com/deb-ict/go-identity/pkg/oauth"
 )
 
-func NewPasswordGrantType(svc OAuthService) GrantTypeHandler {
+func NewPasswordGrantType(svc oauth.OAuthService) oauth.GrantTypeHandler {
 	return &passwordGrantType{
 		svc: svc,
 	}
 }
 
 type passwordGrantType struct {
-	svc OAuthService
+	svc oauth.OAuthService
 }
 
-func (grantType *passwordGrantType) HandleRequest(client *Client, r *http.Request) (*AccessToken, *RefreshToken, error) {
+func (grantType *passwordGrantType) HandleRequest(client *oauth.Client, r *http.Request) (*oauth.AccessToken, *oauth.RefreshToken, error) {
 	ctx := r.Context()
 
 	// Validate the scope request parameter
-	scopes, err := getScopesParam(r)
+	scopes, err := oauth_http.GetScopesParam(r)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -28,11 +31,11 @@ func (grantType *passwordGrantType) HandleRequest(client *Client, r *http.Reques
 	}
 
 	// Get the username and password from request parameters
-	username, err := getStringParam(r, "username")
+	username, err := oauth_http.GetStringParam(r, "username")
 	if err != nil {
 		return nil, nil, err
 	}
-	password, err := getStringParam(r, "password")
+	password, err := oauth_http.GetStringParam(r, "password")
 	if err != nil {
 		return nil, nil, err
 	}

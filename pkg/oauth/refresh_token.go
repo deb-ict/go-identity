@@ -18,7 +18,11 @@ type RefreshToken struct {
 }
 
 func (token *RefreshToken) HasExpired() bool {
-	return token.UpdatedAt.Add(token.Lifetime).Before(time.Now().UTC())
+	if token.TokenExpiration == RefreshTokenExpirationSliding {
+		return token.UpdatedAt.Add(token.Lifetime).Before(time.Now().UTC())
+	} else {
+		return token.CreatedAt.Add(token.Lifetime).Before(time.Now().UTC())
+	}
 }
 
 func (token *RefreshToken) ValidateScope(scope string) bool {

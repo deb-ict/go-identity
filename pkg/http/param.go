@@ -1,4 +1,4 @@
-package oauth
+package http
 
 import (
 	"errors"
@@ -6,11 +6,14 @@ import (
 	"strings"
 )
 
-type GrantTypeHandler interface {
-	HandleRequest(client *Client, r *http.Request) (*AccessToken, *RefreshToken, error)
-}
+func GetScopesParam(r *http.Request) ([]string, error) {
+	if r.Form == nil {
+		err := r.ParseForm()
+		if err != nil {
+			return []string{}, errors.New("invalid_request")
+		}
+	}
 
-func getScopesParam(r *http.Request) ([]string, error) {
 	scopeParam := r.Form["scope"]
 	if len(scopeParam) > 1 {
 		return []string{}, errors.New("invalid_request")
@@ -20,7 +23,14 @@ func getScopesParam(r *http.Request) ([]string, error) {
 	return []string{}, nil
 }
 
-func getStringParam(r *http.Request, name string) (string, error) {
+func GetStringParam(r *http.Request, name string) (string, error) {
+	if r.Form == nil {
+		err := r.ParseForm()
+		if err != nil {
+			return "", errors.New("invalid_request")
+		}
+	}
+
 	value := r.Form[name]
 	if len(value) != 1 {
 		return "", errors.New("invalid_request")

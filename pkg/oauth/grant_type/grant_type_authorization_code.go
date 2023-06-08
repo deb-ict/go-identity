@@ -1,25 +1,28 @@
-package oauth
+package grant_type
 
 import (
 	"errors"
 	"net/http"
+
+	oauth_http "github.com/deb-ict/go-identity/pkg/http"
+	"github.com/deb-ict/go-identity/pkg/oauth"
 )
 
-func NewAuthorizationCodeGrantType(svc OAuthService) GrantTypeHandler {
+func NewAuthorizationCodeGrantType(svc oauth.OAuthService) oauth.GrantTypeHandler {
 	return &authorizationCodeGrantType{
 		svc: svc,
 	}
 }
 
 type authorizationCodeGrantType struct {
-	svc OAuthService
+	svc oauth.OAuthService
 }
 
-func (grantType *authorizationCodeGrantType) HandleRequest(client *Client, r *http.Request) (*AccessToken, *RefreshToken, error) {
+func (grantType *authorizationCodeGrantType) HandleRequest(client *oauth.Client, r *http.Request) (*oauth.AccessToken, *oauth.RefreshToken, error) {
 	ctx := r.Context()
 
 	// Get the code from request parameters
-	code, err := getStringParam(r, "username")
+	code, err := oauth_http.GetStringParam(r, "code")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -34,7 +37,7 @@ func (grantType *authorizationCodeGrantType) HandleRequest(client *Client, r *ht
 	if authorizationCode.ClientId != client.ClientId {
 		return nil, nil, errors.New("invalid_request")
 	}
-	if authorizationCode.Expired() {
+	if authorizationCode.HasExpired() {
 		return nil, nil, errors.New("invalid_request")
 	}
 	if authorizationCode.RedirectUri != "" {

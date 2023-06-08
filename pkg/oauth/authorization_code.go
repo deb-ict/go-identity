@@ -15,7 +15,7 @@ type AuthorizationCode struct {
 	Lifetime    time.Duration
 }
 
-func (code *AuthorizationCode) Expired() bool {
+func (code *AuthorizationCode) HasExpired() bool {
 	return code.CreatedAt.Add(code.Lifetime).Before(time.Now().UTC())
 }
 

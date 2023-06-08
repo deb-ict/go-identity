@@ -4,6 +4,8 @@ import (
 	"context"
 )
 
+//go:generate mockgen -destination=../../mock/oauth/service.go -source=$GOFILE -aux_files $PACKAGE_NAME=$REAL_LOCATION_OF_FILE
+
 type RefreshTokenExpirationType string
 type RefreshTokenUsage string
 type ResponseType string
