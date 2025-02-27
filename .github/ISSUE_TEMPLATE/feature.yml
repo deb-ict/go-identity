@@ -1,0 +1,39 @@
+name: Feature Request
+description: File a bug report
+title: "[FEATURE] "
+type: feature
+labels:
+  - enhancement
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Thank you for taking the time to request a feature!**
+  - type: textarea
+    id: what-feature
+    attributes:
+      label: What feature would you like to see?
+      description: Please describe the feature you would like to see.
+      placeholder: Tell us what you would like to see!
+      value: "I would like to see this feature!"
+    validations:
+      required: true
+  - type: textarea
+    id: why-feature
+    attributes:
+      label: Why do you need this feature?
+      description: Please describe why you need this feature.
+      placeholder: Tell us why you need this feature!
+      value: "I need this feature because..."
+    validations:
+      required: true
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional information
+      description: Please provide any additional information you think is relevant.
+      placeholder: Tell us anything else you think is relevant!
+      value: "Additional information..."
+    validations:
+      required: false
