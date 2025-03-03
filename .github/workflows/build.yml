@@ -3,6 +3,11 @@ permissions:
   contents: read
   pull-requests: write
 on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
   pull_request:
     branches:
       - main
@@ -20,8 +25,23 @@ jobs:
             go-version: '1.23'
             cache: true
 
+        - name: Install dependencies
+          run: |
+            go install github.com/golang/mock/mockgen@v1.6.0
+            go install github.com/go-swagger/go-swagger/cmd/swagger@v0.30.4
+      
+        - name: Generate
+          run: go generate -v ./...
+
         - name: Build
           run: go build ./...
 
         - name: Test
-          run: go test ./...
+          run: go test -json -cover -coverprofile=coverage.out -covermode=atomic -v ./... > report.json
+
+        - name: SonarCloud Scan
+          uses: SonarSource/sonarqube-scan-action@v5.0.0
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            SONAR_TOKEN : ${{ secrets.SONAR_TOKEN }}
+          
