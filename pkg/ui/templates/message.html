@@ -1,0 +1,4 @@
+{{define "content"}}
+{{if .Data.Message}}<p>{{.Data.Message}}</p>{{end}}
+{{if .Data.Links}}<div class="links">{{range .Data.Links}}<a href="{{.Href}}">{{.Text}}</a>{{end}}</div>{{end}}
+{{end}}

@@ -1,0 +1,7 @@
+{{define "content"}}
+<p>You are signed in as <strong>{{.User.Username}}</strong> ({{.User.Email}}).</p>
+<form method="post" action="{{url "/logout"}}">
+<input type="hidden" name="csrf_token" value="{{.CSRF}}">
+<button type="submit" class="secondary">Sign out</button>
+</form>
+{{end}}

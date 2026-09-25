@@ -1,0 +1,57 @@
+{{define "layout"}}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>{{.Title}} · {{.AppName}}</title>
+<style>
+:root {
+  --bg: #f3f4f6; --card: #ffffff; --text: #111827; --muted: #6b7280; --border: #d1d5db;
+  --primary: #2563eb; --primary-hover: #1d4ed8; --error-bg: #fef2f2; --error: #b91c1c;
+  --info-bg: #eff6ff; --info: #1e40af; --success-bg: #f0fdf4; --success: #166534;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --muted: #94a3b8; --border: #334155;
+    --primary: #3b82f6; --primary-hover: #60a5fa; --error-bg: #450a0a; --error: #fecaca;
+    --info-bg: #172554; --info: #bfdbfe; --success-bg: #052e16; --success: #bbf7d0;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 16px; }
+main { width: 100%; max-width: 400px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 32px; }
+.brand { font-weight: 600; color: var(--muted); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 8px; }
+h1 { font-size: 22px; margin: 0 0 20px; }
+p { margin: 0 0 16px; }
+label { display: block; font-weight: 500; margin: 0 0 6px; }
+input[type=text], input[type=email], input[type=password] { width: 100%; padding: 10px 12px; margin: 0 0 16px; border: 1px solid var(--border);
+  border-radius: 8px; background: var(--card); color: var(--text); font: inherit; }
+input:focus { outline: 2px solid var(--primary); outline-offset: 1px; border-color: transparent; }
+button { width: 100%; padding: 10px 16px; border: 0; border-radius: 8px; background: var(--primary); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+button:hover { background: var(--primary-hover); }
+button.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.actions { display: flex; gap: 12px; }
+.alert { padding: 10px 14px; border-radius: 8px; margin: 0 0 16px; }
+.alert.error { background: var(--error-bg); color: var(--error); }
+.alert.info { background: var(--info-bg); color: var(--info); }
+.alert.success { background: var(--success-bg); color: var(--success); }
+.links { margin: 20px 0 0; font-size: 14px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+ul.scopes { padding-left: 20px; margin: 0 0 20px; }
+code { font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+<p class="brand">{{.AppName}}</p>
+<h1>{{.Title}}</h1>
+{{if .Error}}<div class="alert error" role="alert">{{.Error}}</div>{{end}}
+{{if .Info}}<div class="alert info" role="status">{{.Info}}</div>{{end}}
+{{if .Success}}<div class="alert success" role="status">{{.Success}}</div>{{end}}
+{{template "content" .}}
+</main>
+</body>
+</html>{{end}}

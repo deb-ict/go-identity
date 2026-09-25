@@ -1,0 +1,10 @@
+{{define "content"}}
+<p>{{.Data.Intro}}</p>
+<form method="post" action="{{url .Data.Action}}">
+<input type="hidden" name="csrf_token" value="{{.CSRF}}">
+<label for="email">Email</label>
+<input type="email" id="email" name="email" value="{{.Form.email}}" autocomplete="email" autofocus required>
+<button type="submit">{{.Data.Button}}</button>
+</form>
+<div class="links"><a href="{{url "/login"}}">Back to sign in</a></div>
+{{end}}

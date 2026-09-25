@@ -1,0 +1,16 @@
+{{define "content"}}
+<form method="post" action="{{url "/login"}}">
+<input type="hidden" name="csrf_token" value="{{.CSRF}}">
+<input type="hidden" name="return_to" value="{{.Form.return_to}}">
+<label for="login">Username or email</label>
+<input type="text" id="login" name="login" value="{{.Form.login}}" autocomplete="username" autofocus required>
+<label for="password">Password</label>
+<input type="password" id="password" name="password" autocomplete="current-password" required>
+<button type="submit">Sign in</button>
+</form>
+<div class="links">
+<a href="{{url "/password/forgot"}}">Forgot your password?</a>
+{{if .Data.AllowRegistration}}<a href="{{url "/register"}}">Create an account</a>{{end}}
+{{if .Data.ShowResend}}<a href="{{url "/activation/resend"}}">Resend the activation email</a>{{end}}
+</div>
+{{end}}

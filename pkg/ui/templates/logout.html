@@ -1,0 +1,7 @@
+{{define "content"}}
+<p>Do you want to sign out{{if .User}} <strong>{{.User.Username}}</strong>{{end}}?</p>
+<form method="post" action="{{url "/logout"}}">
+<input type="hidden" name="csrf_token" value="{{.CSRF}}">
+<button type="submit">Sign out</button>
+</form>
+{{end}}
