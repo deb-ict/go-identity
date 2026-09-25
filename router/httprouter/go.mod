@@ -1,8 +1,6 @@
 module github.com/deb-ict/go-identity/router/httprouter
 
-go 1.24.0
-
-toolchain go1.24.7
+go 1.26.0
 
 require (
 	github.com/deb-ict/go-identity v0.0.0
