@@ -1,11 +1,11 @@
 module github.com/deb-ict/go-identity/store/sql
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/deb-ict/go-identity v0.0.0
 	github.com/go-sql-driver/mysql v1.10.1
-	github.com/jackc/pgx/v5 v5.8.0
+	github.com/jackc/pgx/v5 v5.11.0
 	modernc.org/sqlite v1.46.1
 )
 
