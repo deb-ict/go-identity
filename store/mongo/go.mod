@@ -1,6 +1,6 @@
 module github.com/deb-ict/go-identity/store/mongo
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/deb-ict/go-identity v0.0.0
