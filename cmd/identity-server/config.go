@@ -111,8 +111,8 @@ func (c *Config) Validate() error {
 	if (c.AdminClientId == "") != (c.AdminClientSecret == "") {
 		return errors.New("the admin client id and secret must be set together")
 	}
-	if c.AdminClientSecret != "" && len(c.AdminClientSecret) < 16 {
-		return errors.New("the admin client secret must have at least 16 characters")
+	if c.AdminClientSecret != "" && (len(c.AdminClientSecret) < 16 || len(c.AdminClientSecret) > 72) {
+		return errors.New("the admin client secret must have between 16 and 72 characters")
 	}
 	switch c.DatabaseDriver {
 	case "memory":

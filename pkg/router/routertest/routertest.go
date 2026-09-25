@@ -32,6 +32,8 @@ func Run(t *testing.T, factory Factory) {
 					parts = append(parts, "field="+v)
 				}
 			}
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			w.Header().Set("X-Content-Type-Options", "nosniff")
 			w.Header().Set("X-Route", name)
 			w.WriteHeader(http.StatusOK)
 			io.WriteString(w, strings.Join(parts, " "))

@@ -166,12 +166,18 @@ func (c *Client) RefreshTokenLifetimeSeconds() int {
 
 // ValidateRedirectUri uses simple string comparison (RFC 6749 section 3.1.2.3, RFC 3986 section 6.2.1).
 func (c *Client) ValidateRedirectUri(uri string) bool {
+	_, ok := c.MatchRedirectUri(uri)
+	return ok
+}
+
+// MatchRedirectUri returns the registered redirection URI that is equal to the uri.
+func (c *Client) MatchRedirectUri(uri string) (string, bool) {
 	for _, redirectUri := range c.RedirectUris {
 		if redirectUri == uri {
-			return true
+			return redirectUri, true
 		}
 	}
-	return false
+	return "", false
 }
 
 func (c *Client) ValidateScope(scope string) bool {

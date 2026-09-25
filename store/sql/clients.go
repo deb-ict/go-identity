@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/deb-ict/go-identity/pkg/identity"
@@ -99,12 +100,12 @@ func (s *Store) DeleteClient(ctx context.Context, id string) error {
 
 // placeholders returns n comma separated '?' placeholders.
 func placeholders(n int) string {
-	b := make([]byte, 0, n*3)
+	var b strings.Builder
 	for i := 0; i < n; i++ {
 		if i > 0 {
-			b = append(b, ", "...)
+			b.WriteString(", ")
 		}
-		b = append(b, '?')
+		b.WriteByte('?')
 	}
-	return string(b)
+	return b.String()
 }

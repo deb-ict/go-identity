@@ -127,14 +127,17 @@ func (s *Server) validateClientAndRedirect(r *http.Request, params url.Values) (
 	if err != nil {
 		return nil, err
 	}
-	req := &authorizeRequest{client: client, redirectUriParam: redirectUri, redirectUri: redirectUri}
+	// The response is only ever sent to a registered redirection URI
+	req := &authorizeRequest{client: client, redirectUriParam: redirectUri}
 	if redirectUri == "" {
 		// Without redirect_uri, the client must have exactly one registered URI (section 3.1.2.3)
 		if len(client.RedirectUris) != 1 {
 			return nil, NewError(ErrorInvalidRequest, "the redirect_uri parameter is missing")
 		}
 		req.redirectUri = client.RedirectUris[0]
-	} else if !client.ValidateRedirectUri(redirectUri) {
+	} else if registered, ok := client.MatchRedirectUri(redirectUri); ok {
+		req.redirectUri = registered
+	} else {
 		return nil, NewError(ErrorInvalidRequest, "the redirect_uri is not registered for this client")
 	}
 	return req, nil

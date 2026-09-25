@@ -200,7 +200,9 @@ func (u *UI) redirect(w http.ResponseWriter, r *http.Request, target string) {
 
 // safeReturnTo only accepts local paths, to prevent open redirects.
 func (u *UI) safeReturnTo(returnTo string) string {
-	if returnTo == "" || !strings.HasPrefix(returnTo, "/") || strings.HasPrefix(returnTo, "//") || strings.ContainsAny(returnTo, "\\\r\n\t") {
+	// A local path starts with a single '/': "//host" and "/\\host" are protocol relative URLs in browsers
+	if len(returnTo) == 0 || returnTo[0] != '/' || len(returnTo) > 1 && (returnTo[1] == '/' || returnTo[1] == '\\') ||
+		strings.ContainsAny(returnTo, "\\\r\n\t") {
 		return u.url(PathHome)
 	}
 	parsed, err := url.Parse(returnTo)

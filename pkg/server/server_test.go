@@ -328,7 +328,7 @@ func TestPasswordResetFlow(t *testing.T) {
 	values = form(page.body)
 	values.Set("password", "short")
 	values.Set("password_confirm", "short")
-	expectStatus(t, e.postForm(b, basePath+"/password/reset", values), 400, "at least 8 characters")
+	expectStatus(t, e.postForm(b, basePath+"/password/reset", values), 400, "Password is too short.")
 	values.Set("password", "new password")
 	values.Set("password_confirm", "new password")
 	expectStatus(t, e.postForm(b, basePath+"/password/reset", values), 200, "Your password has been changed")

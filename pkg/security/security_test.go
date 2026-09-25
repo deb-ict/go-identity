@@ -20,16 +20,20 @@ func TestBcryptHasher(t *testing.T) {
 		t.Fatalf("expected mismatch, got %v", err)
 	}
 
-	long := strings.Repeat("a", 80)
-	hash, err = h.Hash(long)
+	// bcrypt ignores everything after 72 bytes: longer secrets are refused, not truncated
+	max := strings.Repeat("a", MaxSecretLength)
+	hash, err = h.Hash(max)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := h.Verify(hash, long); err != nil {
-		t.Fatalf("expected long secret to match: %v", err)
+	if err := h.Verify(hash, max); err != nil {
+		t.Fatalf("expected 72 byte secret to match: %v", err)
 	}
-	if err := h.Verify(hash, long[:72]+"b"+long[73:]); err == nil {
-		t.Fatal("secrets longer than 72 bytes must not be truncated")
+	if _, err := h.Hash(max + "a"); !errors.Is(err, ErrSecretTooLong) {
+		t.Fatalf("expected ErrSecretTooLong, got %v", err)
+	}
+	if err := h.Verify(hash, max+"b"); !errors.Is(err, ErrMismatch) {
+		t.Fatal("a secret with a matching 72 byte prefix must not match")
 	}
 }
 

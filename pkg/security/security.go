@@ -13,8 +13,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// ErrMismatch is returned when a password or secret doesn't match the hash.
-var ErrMismatch = errors.New("security: secret mismatch")
+var (
+	// ErrMismatch is returned when a password or secret doesn't match the hash.
+	ErrMismatch = errors.New("security: secret mismatch")
+	// ErrSecretTooLong is returned when a secret exceeds MaxSecretLength.
+	ErrSecretTooLong = errors.New("security: secret too long")
+)
+
+// MaxSecretLength is the maximum length in bytes of a password or client secret (the bcrypt limit).
+const MaxSecretLength = 72
 
 // PasswordHasher hashes and verifies user passwords and client secrets.
 type PasswordHasher interface {
@@ -36,8 +43,11 @@ func NewBcryptHasher(cost int) *BcryptHasher {
 }
 
 func (h *BcryptHasher) Hash(secret string) (string, error) {
-	// bcrypt only uses the first 72 bytes, pre-hash longer secrets so they are not truncated.
-	hash, err := bcrypt.GenerateFromPassword(prehash(secret), h.Cost)
+	// bcrypt only uses the first 72 bytes, longer secrets are refused instead of truncated.
+	if len(secret) > MaxSecretLength {
+		return "", ErrSecretTooLong
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(secret), h.Cost)
 	if err != nil {
 		return "", err
 	}
@@ -45,19 +55,14 @@ func (h *BcryptHasher) Hash(secret string) (string, error) {
 }
 
 func (h *BcryptHasher) Verify(hash string, secret string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), prehash(secret))
+	if len(secret) > MaxSecretLength {
+		return ErrMismatch
+	}
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(secret))
 	if err != nil {
 		return ErrMismatch
 	}
 	return nil
-}
-
-func prehash(secret string) []byte {
-	if len(secret) <= 72 {
-		return []byte(secret)
-	}
-	sum := sha256.Sum256([]byte(secret))
-	return []byte(base64.RawStdEncoding.EncodeToString(sum[:]))
 }
 
 // RandomBytes returns n cryptographically secure random bytes.

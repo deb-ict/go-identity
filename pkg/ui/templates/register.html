@@ -6,7 +6,8 @@
 <label for="email">Email</label>
 <input type="email" id="email" name="email" value="{{.Form.email}}" autocomplete="email" required>
 <label for="password">Password</label>
-<input type="password" id="password" name="password" autocomplete="new-password" required minlength="{{.Data.MinPasswordLength}}">
+<input type="password" id="password" name="password" autocomplete="new-password" required minlength="{{.Data.MinPasswordLength}}" aria-describedby="password_hint">
+<p class="hint" id="password_hint">Use at least {{.Data.MinPasswordLength}} characters.</p>
 <label for="password_confirm">Confirm password</label>
 <input type="password" id="password_confirm" name="password_confirm" autocomplete="new-password" required>
 <button type="submit">Create account</button>

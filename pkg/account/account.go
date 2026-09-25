@@ -5,7 +5,6 @@ package account
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"strings"
 	"sync"
@@ -105,10 +104,10 @@ func (s *Service) now() time.Time {
 // ValidatePassword checks the password policy.
 func (s *Service) ValidatePassword(password string) error {
 	if utf8.RuneCountInString(password) < s.opts.MinPasswordLength {
-		return identity.NewValidationError("password", fmt.Sprintf("must have at least %d characters", s.opts.MinPasswordLength))
+		return identity.NewValidationError("password", "is too short")
 	}
-	if len(password) > 1024 {
-		return identity.NewValidationError("password", "is too long")
+	if len(password) > security.MaxSecretLength {
+		return identity.NewValidationError("password", "is too long, the maximum is 72 bytes")
 	}
 	return nil
 }

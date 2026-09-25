@@ -311,8 +311,8 @@ with the environment variable in brackets.
 
 ## Security
 
-- Passwords and client secrets are hashed with bcrypt. Secrets longer than 72 bytes are
-  pre-hashed instead of silently truncated.
+- Passwords and client secrets are hashed with bcrypt. Because bcrypt ignores everything after
+  72 bytes, longer secrets are refused rather than silently truncated.
 - Access tokens, refresh tokens, authorization codes and email tokens are random 256-bit values.
   Only their SHA-256 hash is stored.
 - Authorization codes are consumed atomically in every store, so two simultaneous requests can't
