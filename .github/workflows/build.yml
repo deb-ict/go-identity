@@ -1,27 +1,89 @@
 name: Build & Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 permissions:
   contents: read
-  pull-requests: write
-on:
-  pull_request:
-    branches:
-      - main
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - .
+          - cmd/identity-server
+          - router/chi
+          - router/echo
+          - router/gin
+          - router/gorillamux
+          - router/httprouter
+          - store/mongo
+          - store/sql
 
-        - name: Setup Golang
-          uses: actions/setup-go@v5
-          with:
-            go-version: '1.23'
-            cache: true
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: identity
+          POSTGRES_PASSWORD: identity
+          POSTGRES_DB: identity_test
+        ports: [ "5432:5432" ]
+        options: >-
+          --health-cmd "pg_isready -U identity"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: identity_test
+        ports: [ "3306:3306" ]
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      mongo:
+        image: mongo:7
+        ports: [ "27017:27017" ]
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 5s --health-timeout 5s --health-retries 10
 
-        - name: Build
-          run: go build ./...
+    env:
+      # Build every module on its own, the way it is consumed
+      GOWORK: "off"
+      IDENTITY_TEST_POSTGRES_DSN: postgres://identity:identity@127.0.0.1:5432/identity_test?sslmode=disable
+      IDENTITY_TEST_MYSQL_DSN: root:root@tcp(127.0.0.1:3306)/identity_test
+      IDENTITY_TEST_MONGO_URI: mongodb://127.0.0.1:27017
 
-        - name: Test
-          run: go test ./...
+    defaults:
+      run:
+        working-directory: ${{ matrix.module }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: ${{ matrix.module }}/go.mod
+        cache-dependency-path: ${{ matrix.module }}/go.sum
+
+    - name: Check formatting
+      run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+
+    - name: Check go.mod is tidy
+      run: go mod tidy && git diff --exit-code -- go.mod go.sum
+
+    - name: Vet
+      run: go vet ./...
+
+    - name: Build
+      run: go build ./...
+
+    - name: Test
+      run: go test -race ./...

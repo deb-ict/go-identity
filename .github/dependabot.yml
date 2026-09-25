@@ -7,9 +7,13 @@ updates:
     labels:
       - "github-actions"
       - "dependencies"
-  
+
   - package-ecosystem: "gomod"
-    directory: "/"
+    directories:
+      - "/"
+      - "/cmd/identity-server"
+      - "/router/*"
+      - "/store/*"
     schedule:
       interval: "weekly"
     labels:

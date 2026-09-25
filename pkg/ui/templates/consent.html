@@ -1,0 +1,18 @@
+{{define "content"}}
+<p><strong>{{.Data.ClientName}}</strong> wants to access your account <strong>{{.User.Username}}</strong>.</p>
+{{if .Data.Description}}<p>{{.Data.Description}}</p>{{end}}
+{{if .Data.Scopes}}
+<p>It requests the following permissions:</p>
+<ul class="scopes">{{range .Data.Scopes}}<li><code>{{.}}</code></li>{{end}}</ul>
+{{end}}
+<form method="post" action="{{.Data.Action}}">
+<input type="hidden" name="csrf_token" value="{{.CSRF}}">
+{{range $name, $values := .Data.Params}}{{range $values}}<input type="hidden" name="{{$name}}" value="{{.}}">
+{{end}}{{end}}
+<div class="actions">
+<button type="submit" name="consent" value="deny" class="secondary">Deny</button>
+<button type="submit" name="consent" value="allow">Allow</button>
+</div>
+</form>
+<div class="links"><a href="{{url "/logout"}}">Not {{.User.Username}}? Sign out</a></div>
+{{end}}
