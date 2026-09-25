@@ -13,3 +13,12 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Go workspace checksums
+go.work.sum
+
+# Local databases and binaries
+*.db
+*.db-journal
+/identity-server
+/cmd/identity-server/identity-server
